@@ -10,7 +10,6 @@ from sklearn.linear_model import BayesianRidge, LinearRegression, Ridge
 # from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import make_pipeline
 import sys
-import coltools as ct # TODO REMOVE
 
 # TODOS
 # Nice plot of significance
@@ -330,7 +329,7 @@ class Probe(object):
         rightscores = np.zeros(x_test.shape[0], dtype=np.float16)
         while i < x_test.shape[0]:
             # TODO REMOVE
-            ct.progbar(int(i/batch_size), int(x_test.shape[0]/batch_size))
+            # ct.progbar(int(i/batch_size), int(x_test.shape[0]/batch_size))
             scores = self.predict_function(self.model, x_test[i:i+batch_size])
             rightscores[i:i+batch_size] = scores[np.arange(scores.shape[0]), y_test[i:i+batch_size]]
 
