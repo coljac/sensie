@@ -16,12 +16,11 @@ Sensie can operate on models trained for discrete (classifier) or ~~continuous (
 Sensie can be adapted to works on any predictive model.
 
 **Main outstanding issues:**
-- Easier Pytorch support
 - Proper support for regression models
 
 ## Requirements
 
-Sensie assumes a Keras-like interface (tensorflow) but with a user supplied predictor function, any framework should be applicable. Prequisites are listed in `requirements.txt`. The [pymc3](https://github.com/pymc-devs/pymc3) probabilistic programming framework is required for the (optional) determination of credible intervals for feature sensitivities. This can be used to assess the significance of a sensitivity analysis.
+Sensie assumes a model object with a ``predict`` method (as per Keras), but with a user supplied predictor function any framework should be usable. Prequisites are listed in `requirements.txt`. The [pymc3](https://github.com/pymc-devs/pymc3) probabilistic programming framework is required for the (optional) determination of credible intervals for feature sensitivities. This can be used to assess the significance of a sensitivity analysis.
 
 ## Outline of usage
 
