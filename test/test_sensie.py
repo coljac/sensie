@@ -1,7 +1,9 @@
 import numpy as np
 import sys, os
+
 sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../sensie")
 import sensie
+
 
 class FakeModel(object):
     
@@ -148,3 +150,7 @@ def test_perturber_high():
                                                  plot=False, label="fake")
     result.get_credible_intervals()
     assert np.abs(result.tests['fake'].beta) < 0.002 and (result.tests['fake'].get_significance() == "low")
+
+
+if __name__=="__main__":
+    print("Run these tests with pytest.")
