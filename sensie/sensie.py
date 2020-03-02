@@ -1,37 +1,15 @@
 import sys
-# import os
-# import time
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-# import scipy
 from scipy import stats
 from sklearn.linear_model import BayesianRidge, LinearRegression, Ridge
-# from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import make_pipeline
 import sys
+# import pymc3 is done inside method below, so the module works without it.
 
-# TODOS
-# Nice plot of significance
-# Package it up properly
-# Document the categorical convention
-# Tests
 
-#### For version 0.0.1
-# Arviz PDF [ ]
-# Linear fit plot [X]
-# Polynomial fits [X]
-# Fit all properties at once [ ]
-# Enhanced summary [x]
-# Plot labelling [ ]
-# Plot font size [ ]
-# Simple class analysis method [X]
-# Refactor API slightly [-]
-# TESTS
-# DOCS
-# Show pdf
-# Save results in an efficient format [ ]
-def progbar(current, to, width=40, show=True, message=None, stderr=False):
+def _progbar(current, to, width=40, show=True, message=None, stderr=False):
     percent = float(current) / float(to)
     length = int(width * percent)
     if show:
@@ -53,7 +31,23 @@ class SingleTest(object):
     """
     def __init__(self, property_name, p_vals, means, stds, p_points=None, y_vals=None):
         """
+        Parameters
+        ----------
         p_vals: ndarray
+            The discrete values of the parameter tested.
+
+        means: ndarray
+            The mean scores for all examples in the test set (in the ground truth class) with the corresponding value of p.
+
+        stds: ndarray
+            The standard deviations of the scores, by p.
+
+        p_points:
+            All values of p (one per example in the test set) - used if not binning by p.
+            
+        y_vals:
+           All correct scores for the test set.
+
         """
         self.property_name = property_name
         self.p_vals = p_vals
@@ -89,7 +83,11 @@ class SingleTest(object):
         if labels is not None:
             return np.array(labels)[class_ordering]
 
-    def get_gradient(self):
+    def get_gradient(self) -> float:
+        """Returns the gradient of the test - the change in mean score by p. 
+
+        Returns: The gradient from a linear fit to xs, ys."""
+
         ys = self.means
         xs = self.p_vals
         fit = self._fit_line(xs, ys)  
@@ -107,11 +105,12 @@ class SingleTest(object):
         """ Uses Bayesian inference courtesy of pymc3 to estimate the sensitivity
         coefficient (i.e. the gradient of correct score as a function of a given 
         property and provide a 95% credible interval. (If zero is in this
-        interval we interpret the gradient as not very significant.) """
+        interval we interpret the gradient as not very significant.) 
+        """
 
-        # Don't require pymc3 unless we are using this method
+        # Don't require pymc3 unless we are using this method; sorry PEP
         import pymc3 as pm
-        import arviz as az
+
         if tune is None:
             tune = int(samples/2)
         with pm.Model() as model_g:
@@ -129,9 +128,13 @@ class SingleTest(object):
 
         return beta_m, pm.stats.hpd(trace_g['beta'], alpha=0.05), pm.stats.hpd(trace_g['beta'], alpha=0.5), trace_g
 
-    def get_significance(self):
+    def get_significance(self, significance_floor=0.02):
+        """
+            Returns a string indicating the significance of a sensitivity measure.    
+        """
         if self.beta is None:
             return None
+        magnitude = np.abs(self.beta)
         if np.isnan(self.ci_95_low):
             sig = (self.means[0] - self.means[-1])/self.stds.mean()
             if np.abs(sig) > 0:
@@ -139,6 +142,8 @@ class SingleTest(object):
             else:
                 return "low"
         else:
+            if magnitude < significance_floor:
+                return "low"
             if (self.ci_95_low > 0 and self.ci_95_high > 0) or (self.ci_95_low < 0 and self.ci_95_high < 0):
                 return "high"
             elif (self.ci_50_low > 0 and self.ci_50_high > 0) or (self.ci_50_low < 0 and self.ci_50_high < 0):
@@ -147,7 +152,11 @@ class SingleTest(object):
                 return "low"
 
 
-    def get_credible_interval(self, means_only=False, tune=None, samples=400):
+    def set_credible_interval(self, means_only=False, tune=None, samples=400):
+        """
+            Runs pymc3 inference code to determine the slope of the relationship between p and 
+            accuracy, and saves 50% and 95% credible intervals in instance variables.
+        """
         ys = self.y_vals
         if means_only or ys is None:
             ys = self.means
@@ -158,15 +167,13 @@ class SingleTest(object):
         results = self._run_inference(xs, ys, samples=samples, tune=tune)
         self.set_fit(results[0], results[3]['alpha'].mean(), ci_95_low=results[1][0], ci_95_high=results[1][1], ci_50_low=results[2][0], 
                     ci_50_high=results[2][1], pos=results[3])
-        return results
 
 
     def summary(self):
         """ Show the result (gradient) of score sensitivity to this property, 
             optionally with credible intervals.
 
-            Returns:
-            A pandas DataFrame with the results of the test.
+            Returns: A pandas.DataFrame with the results of the test, including credible intervals if calculated.
         """
         if self.beta is None:
             try:
@@ -195,6 +202,8 @@ class SingleTest(object):
 
 class SensitivityMeasure(object):
     """
+    This object wraps the individual tests performed on a model, and provides convience methods
+    for setting credible intervals and displaying a summary.
     """
     def __init__(self, x_test, y_test, rightscores):
         """
@@ -205,8 +214,6 @@ class SensitivityMeasure(object):
         self.tests = {}
 
     def append(self, label, ps, means, stds, p_points=None, y_vals=None):
-        """
-        """
         self.tests[label] = SingleTest(label, ps, means, stds, p_points=p_points, y_vals=y_vals)
 
     def summary(self):
@@ -222,9 +229,9 @@ class SensitivityMeasure(object):
                 result.append(self.tests[test].summary())
         return result
 
-    def get_credible_intervals(self):
+    def set_credible_intervals(self):
         for label, test in self.tests.items():
-            test.get_credible_interval()
+            test.set_credible_interval()
 
 
 class Probe(object):
@@ -232,9 +239,15 @@ class Probe(object):
        and sensitivity to various properties."""
 
     def __init__(self, model, predict_function=None):
-        """model: A pretrained model object.
-        predict_function: a function that takes a tensor of inputs and returns a vector of scores. By default,
-         assumes a Keras.Model obkect and calls the model.predict() method."""
+        """
+        Parameters
+        ----------
+        model: object
+            A pretrained model object.
+
+        predict_function: function
+            A function that takes a tensor of inputs and returns a vector of scores. By default, 
+            Sensie assumes the model is an object with a predict() method."""
 
         self.model = model
         if predict_function is None:
@@ -259,8 +272,13 @@ class Probe(object):
             Tensor or DataFrame containing the property/properties for testing.
 
         prop: int or str
-            (Optional) A numerical or string index into p_test, returning a vector or Series of the property
-        in question. If this is None, will attempt for all columns in p_test
+            (Optional) A numerical or string index into p_test, returning a vector or Series of the property in question. If this is None, will attempt for all columns in p_test
+    
+        continuous: bool
+            If true, assumes the p value is continues and needs to be binned.
+
+        bins: int
+            Number of bins; used if continuous == True.
 
         label: str
             (Optional) An string label for the property/properties in question; used for plotting.
@@ -268,14 +286,18 @@ class Probe(object):
         plot: bool
             If True, produce and display a plot of the results.
 
+        propnames: list or array
+            A list of property names, corresponding to p_test.
+
+        batch_size: int
+            When calling the predict method, the batch size to use.
+
         Returns
         -------
         SensitivityMeasure
             An object containing summary information about the analysis.
         """
 
-        # scores = self.predict_function(self.model, x_test, batch_size=batch_size)
-        # rightscores = scores[np.arange(scores.shape[0]), y_test]
         rightscores = self._run_prediction(x_test, y_test, batch_size=batch_size)
 
         if propnames is None:
@@ -293,7 +315,7 @@ class Probe(object):
 
         results = SensitivityMeasure(x_test, y_test, rightscores)
         for idx, propname in enumerate(propnames):
-            progbar(idx+1, len(propnames), message = propname + "     ")
+            _progbar(idx+1, len(propnames), message = propname + "     ")
 
             if type(p_test) == pd.DataFrame:
                 p_values = p_test.loc[:, propname]
@@ -317,22 +339,21 @@ class Probe(object):
 
         if plot:
             # if ci:
-                # results.tests[label].get_credible_interval(means_only=False)
+                # results.tests[label].set_credible_interval(means_only=False)
             # else:
             results.tests[propname].get_gradient()
-            self.plot_property(results.tests[propname], label=label)
+            self._plot_property(results.tests[propname], label=label)
 
         return results
 
     def _run_prediction(self, x_test, y_test, batch_size=256):
+        """Invokes the model predict method on x_test, and returns the scores for the 
+        ground-truth class in y_test."""
         i = 0
         rightscores = np.zeros(x_test.shape[0], dtype=np.float16)
         while i < x_test.shape[0]:
-            # TODO REMOVE
-            # ct.progbar(int(i/batch_size), int(x_test.shape[0]/batch_size))
             scores = self.predict_function(self.model, x_test[i:i+batch_size])
             rightscores[i:i+batch_size] = scores[np.arange(scores.shape[0]), y_test[i:i+batch_size]]
-
 
             i += batch_size
         return rightscores
@@ -375,7 +396,7 @@ class Probe(object):
 
     def predict_and_measure_perturbed(self, x_test, y_test, perturber, p_values=None,
                                       p_min=0, p_max=1, steps=10, label=None,
-                                      plot=False, ci=False) -> SensitivityMeasure:
+                                      plot=False, ci=False, batch_size=1024) -> SensitivityMeasure:
         """Scores the provided x_test as altered by the supplied perturber function, and returns
         a SensitivityMeasure object with measured values and for plotting.
 
@@ -408,6 +429,12 @@ class Probe(object):
 
         plot: bool
             If True, produce and display a plot of the results.
+        
+        ci: bool
+            If True, will conduct linear fit and generate credible intervals.
+        
+        batch_size: int
+            The x_test examples will be perturbed and scored in batches of this size.
 
         Returns
         -------
@@ -422,20 +449,16 @@ class Probe(object):
         elif type(p_values) != np.ndarray:
             p_values = np.array(p_values)
 
-        # p_scores = np.asarray([y_test] * p_values.size) * 0.00
         p_scores = np.zeros(y_test.shape[0] * p_values.size)
         p_test_values = np.zeros(y_test.shape[0] * p_values.size)
-        #TODO: progbar
-        #TODO: Do in batches, for now do all at once
 
+        use_batches = True
         for i, p_val in enumerate(p_values):
-            # This needs to go in batches onto separate processors
-            # ########
-            # Batch
-            # ########
-            progbar(i+1, len(p_values), message=f"{p_val:.2f}  ")
-            if True:
-                batch_size = 1000
+            # #######
+            # Batch #
+            # #######
+            _progbar(i+1, len(p_values), message=f"{p_val:.2f}  ")
+            if use_batches:
                 num_batches = int(x_test.shape[0]/batch_size) + 1
                 for b in range(num_batches):
                     s = b*batch_size
@@ -470,50 +493,55 @@ class Probe(object):
 
         if plot:
             if ci:
-                results.tests[label].get_credible_interval(means_only=False)
+                results.tests[label].set_credible_interval(means_only=False)
             else:
                 results.tests[label].get_gradient()
-            self.plot_property(results.tests[label], label=label)
-
-        for var, obj in locals().items():
-            sz = sys.getsizeof(obj)
-            if sz > 100000:
-                print(var, sz/1e6)
+            self._plot_property(results.tests[label], label=label)
 
         return results
 
     def test_class_sensitivity(self, x_test, y_test, plot=False):
+        """Same as predict_and_measure, except the property is the ground truth class itself. Useful to see if certain
+        classes in the test set have markedly different performance to others.
+    
+        Parameters
+        ----------
+        x_test: numpy.ndarray
+            Tensor of examples for testing
+
+        y_test: numpy.ndarray
+            Vector of ground-truth classes
+
+        plot: bool
+            If True, generates a plot of the results.
+        """
+
         results = self.predict_and_measure(x_test, y_test, y_test, prop=None, label="class", propnames=["class"])
         labels = [str(x) for x in range(len(np.unique(y_test)))]
         labels = results.tests['class'].sort_and_reorder(labels)
         if plot:
-            self.plot_property(results.tests['class'], label="class", ticklabels=labels)
+            self._plot_property(results.tests['class'], label="class", ticklabels=labels)
         return results
 
 
-    def plot_significance(self, test, label=None):
-        beta = test.pos['beta']
-        summary = test.summary().iloc[0]
-        min_, max_, mean_ = beta.min(), beta.max(), beta.mean()
-        plt.hist(beta, bins=50)
+    # def plot_significance(self, test, label=None):
+        # beta = test.pos['beta']
+        # summary = test.summary().iloc[0]
+        # min_, max_, mean_ = beta.min(), beta.max(), beta.mean()
+        # plt.hist(beta, bins=50)
 
-        plt.xlim(min(min_, -0.05), max(max_, 0.05))
-        plt.axvline(0, ls="--", color="black")
-        plt.axvline(summary.sens_50_low, ls="--", color="red")
-        plt.axvline(summary.sens_50_high, ls="--", color="red")
-        plt.axvline(summary.sens_95_low, ls="--", color="green")
-        plt.axvline(summary.sens_95_high, ls="--", color="green")
-        if label is not None:
-            plt.title(f"{label} significance: {summary.significance}");
-
-    def plot_all(self, measure):
-        # TODO
-        pass
+        # plt.xlim(min(min_, -0.05), max(max_, 0.05))
+        # plt.axvline(0, ls="--", color="black")
+        # plt.axvline(summary.sens_50_low, ls="--", color="red")
+        # plt.axvline(summary.sens_50_high, ls="--", color="red")
+        # plt.axvline(summary.sens_95_low, ls="--", color="green")
+        # plt.axvline(summary.sens_95_high, ls="--", color="green")
+        # if label is not None:
+            # plt.title(f"{label} significance: {summary.significance}");
 
 
-    def plot_property(self, test, label="property", show_fit=False, fit="line", annotate=False, save_to=None, ticklabels=None, errorbars=True, fitorder=2):
-        # import seaborn as sns
-        # sns.set(style="darkgrid")
+    def _plot_property(self, test, label="property", show_fit=False, fit="line", annotate=False, save_to=None, ticklabels=None, errorbars=True, fitorder=2):
+        """Generates a plot from a SingleTest result."""
 
         if errorbars:
             plt.errorbar(test.p_vals, test.means, yerr=test.stds, marker="o", fmt='-o')
