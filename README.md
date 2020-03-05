@@ -42,7 +42,9 @@ Detailed documentation can be accessed at readthedocs.org.
 When Sensie reports the significance of the effect, it is reporting whether there is a detectable
 linear relationship between the property measured and model's score for the correct class for
 each example. In other words, it assumes that 
-<p align="center"><img src="/tex/77b8b439ca87e934bf6f2be3a45670ec.svg?invert_in_darkmode&sanitize=true" align=middle width=73.01983424999999pt height=16.438356pt/></p>, where 
+<p align="center"><img src="/tex/77b8b439ca87e934bf6f2be3a45670ec.svg?invert_in_darkmode&sanitize=true" align=middle width=73.01983424999999pt height=16.438356pt/></p>
+
+where 
 
 <p align="center"><img src="/tex/9e4d84b983988415d2c3c7fefeda5dd7.svg?invert_in_darkmode&sanitize=true" align=middle width=101.81349254999999pt height=12.785402849999999pt/></p> 
 
@@ -76,6 +78,10 @@ sensie_mnist.predict_and_measure_perturbed(X_test, y_test,
 From this we can see that the trained model is sensitive to the orientation of an input; beyond about 20 degrees, accuracy suffers significantly.
 
 For this and some more complex examples, see the Jupyter notebooks in the `examples` directory.
+
+## Documentation
+
+Module docs can be found at [sensie.readthedocs.org](https://sensie.readthedocs.io/en/latest/).
 
 ### References
 
