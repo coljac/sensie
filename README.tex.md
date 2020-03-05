@@ -42,7 +42,9 @@ Detailed documentation can be accessed at readthedocs.org.
 When Sensie reports the significance of the effect, it is reporting whether there is a detectable
 linear relationship between the property measured and model's score for the correct class for
 each example. In other words, it assumes that 
-$$ \bar{y_c} = f(p_i)  $$, where 
+$$ \bar{y_c} = f(p_i)  $$
+
+where 
 
 $$  \bar{y_c} = a_1 p_i + a_2 $$ 
 
@@ -76,6 +78,10 @@ sensie_mnist.predict_and_measure_perturbed(X_test, y_test,
 From this we can see that the trained model is sensitive to the orientation of an input; beyond about 20 degrees, accuracy suffers significantly.
 
 For this and some more complex examples, see the Jupyter notebooks in the `examples` directory.
+
+## Documentation
+
+Module docs can be found at [sensie.readthedocs.org](https://sensie.readthedocs.io/en/latest/).
 
 ### References
 
