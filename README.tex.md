@@ -20,28 +20,49 @@ Sensie can be adapted to works on any predictive model.
 
 ## Requirements
 
-Sensie assumes a model object with a ``predict`` method (as per Keras), but with a user supplied predictor function any framework should be usable. Prequisites are listed in `requirements.txt`. The [pymc3](https://github.com/pymc-devs/pymc3) probabilistic programming framework is required for the (optional) determination of credible intervals for feature sensitivities. This can be used to assess the significance of a sensitivity analysis.
+Sensie assumes a model object with a ``predict`` method (as per Keras), but with a user supplied predictor function any framework should be usable. Python prequisites are listed in `requirements.txt`. The [pymc3](https://github.com/pymc-devs/pymc3) probabilistic programming framework is required for the (optional) determination of credible intervals for feature sensitivities. This can be used to assess the significance of a sensitivity analysis.
+
+## Installation
+
+After cloning the repository, I recommend creating a [virtual environment](https://docs.python.org/3/library/venv.html) for Sensie (currently, Sensie requires PyMC3 3.7). Clone the repository and install with:
+
+```
+pip install -e .
+```
+
+Which will isntall Sensie and the required python libraries. Optionally, install `pytest` with `pip install pytest`, then run the tests with `pytest test` from the repository root.
 
 ## Outline of usage
 
-- Create a `sensie.Probe` instance to wrap a pre-trained model.
-- Pass the probe a test set, ground truths, and either a vector/tensor containing the property/properties to test, or a function that mutates a training example, taking a scalar parameter indicating the size of the effect.
+See the example below, and the notebooks in `examples/` for some detailed examples of how Sensie can be used. In summary:
+
+- Create a `sensie.Probe` instance to wrap a pre-trained model:
+```
+    probe = sensie.Probe(model=model)
+```
+- Pass the Probe a test set, ground truths, and either a vector/tensor containing the property/properties to test, or a function that mutates a training example, taking a scalar parameter indicating the size of the effect.
+```
+    probe.predict_and_measure_perturbed(X_test, y_test, peturb_func, ...)
+```
 - Sensie will return a `sensie.SensitivityMeasure` object, a collection of the results of each test represented by `sensie.SingleTest` objects.
 - Examine a plot of the outcome of each test, or print the `summary` to quantify the size of the effect.
-- The sensitivity, i.e. the gradient of mean correct score with property $p_i$, is determined using ordinary linear regression (`sensie.Probe.get_gradient`) or using Bayesian inference with pymc3; this in turn supplies a 50%/95% credible interval for the sensitivity.
+- Is the effect significant? The sensitivity, i.e. the gradient of mean correct score with property $p_i$, is determined using ordinary linear regression (`sensie.Probe.get_gradient`) or using Bayesian inference with PyMC3; this in turn supplies a 50%/95% credible interval for the sensitivity.
 - Where the relationship is non-linear, polynomial fits can also be visualised in order to identify regions of the parameter space where the network is most sensitive to the supplied property.
 
-Sensie has several options for plotting the results. See the docs and examples for more information.
+Sensie has several options for plotting the results. See the [docs](https://sensie.readthedocs.io/en/latest/) and examples for more information.
 
 Sensie assumes that `model.predict` returns a tensor `t` with categorical scores, such that `t[i, j]` returns the score for class *j* for test example *i*. If this is not the case, supply a predictor function at instantiation time that does: `probe = sensie.Probe(model, predictor)` where `predictor` is a function with the signature `predictor(model, x_test)` and returns a tensor of dimensions `(N, n_classes)`.
 
-Detailed documentation can be accessed at readthedocs.org.
+Detailed documentation can be accessed at [readthedocs.org](https://sensie.readthedocs.io/en/latest/).
 
 ## Calculation of the signficance of the effect
 
 When Sensie reports the significance of the effect, it is reporting whether there is a detectable
 linear relationship between the property measured and model's score for the correct class for
-each example. In other words, it assumes that 
+each example. In other words, if we assume the accuracy is a function of some property of the inputs,
+is the function affecting the scores in a significant way?
+
+Formally, Sensie tests the assumption that 
 $$ \bar{y_c} = f(p_i)  $$
 
 where 
@@ -62,7 +83,7 @@ Whether this is meaningful is highly context dependent! [1]
 How sensitive is a model trained on MNIST digits to the orientation of the digits?
 ```
 def rotate(x, angle):
-  # code that rotates the image by angle degrees goes here, see examples/MNIST
+  # code that rotates the image by _angle_ degrees goes here, see examples/MNIST
   # x_rotated = ...
   return x_rotated
 
@@ -83,7 +104,14 @@ For this and some more complex examples, see the Jupyter notebooks in the `examp
 
 Module docs can be found at [sensie.readthedocs.org](https://sensie.readthedocs.io/en/latest/).
 
-### References
+## Bugs, questions and contributions
 
+If you use Sensie and run into any problems, please open an issue here.
+
+Any questions, comments and suggestions can be sent via GitHub or to colin(@)coljac.net.
+
+Contributions are welcome. Fork this repository to your own machine, make some changes, and push your work back up to the fork and open a [Pull Request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests) so that I can review the changes.
+
+### References
 
 [1]: Consider `plt.scatter(np.arange(0, 100), np.sort(np.random.random(100)))`.

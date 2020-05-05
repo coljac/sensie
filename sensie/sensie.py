@@ -207,6 +207,14 @@ class SensitivityMeasure(object):
     """
     def __init__(self, x_test, y_test, rightscores):
         """
+        x_test: numpy.ndarray
+            The test data for this test.
+
+        y_test: numpy.ndarray
+            The ground truths for this test.
+
+        rightscores: numpy.ndarray
+            XXX
         """
         # self.x_test = x_test
         self.y_test = y_test

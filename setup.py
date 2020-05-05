@@ -9,4 +9,9 @@ setup(name='Sensie',
       author_email='colin@coljac.space',
       url='https://github.com/coljac/sensie/',
       packages=['sensie'],
+      install_requires = ["matplotlib", "numpy",
+        "pandas", "pymc3==3.7",
+        "scikit-learn", "scipy"
+       ]
      )
+

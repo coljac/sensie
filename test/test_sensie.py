@@ -53,7 +53,7 @@ def test_no_correlation():
     fake_p = np.random.randint(10, size=1000)
     probe = sensie.Probe(model)
     result = probe.predict_and_measure(X_test, y_test, fake_p, plot=False, propnames=["fake"]);
-    result.get_credible_intervals()
+    result.set_credible_intervals()
     assert np.abs(result.tests['fake'].beta) < 0.002 and (result.tests['fake'].get_significance() == "low")
 
 # Test 2: Fake model with significant correlation
@@ -75,7 +75,7 @@ def test_high_correlation():
 
     probe = sensie.Probe(model)
     result = probe.predict_and_measure(X_test, y_test, fake_p, plot=False, propnames=["fake"]);
-    result.get_credible_intervals()
+    result.set_credible_intervals()
     assert np.abs(result.tests['fake'].beta) > 0.05 and (result.tests['fake'].get_significance() == "high")
 
 
@@ -122,7 +122,7 @@ def test_perturber_low():
     probe = sensie.Probe(model)
     result = probe.predict_and_measure_perturbed(X_test, y_test, perturb, p_min=1, p_max=10, steps=10, 
                                                  plot=False, label="fake")
-    result.get_credible_intervals()
+    result.set_credible_intervals()
     assert np.abs(result.tests['fake'].beta) > 0.05 and (result.tests['fake'].get_significance() == "high")
 
 
@@ -148,7 +148,7 @@ def test_perturber_high():
     probe = sensie.Probe(model)
     result = probe.predict_and_measure_perturbed(X_test, y_test, perturb_dont, p_min=1, p_max=10, steps=10, 
                                                  plot=False, label="fake")
-    result.get_credible_intervals()
+    result.set_credible_intervals()
     assert np.abs(result.tests['fake'].beta) < 0.002 and (result.tests['fake'].get_significance() == "low")
 
 
