@@ -11,7 +11,7 @@ Sensie probes the sensitivity of a network to inputs with a particular property,
 
 Although the algorithm is simple, it has the potential to highlight and quantify gaps in the training set or areas of increasing unrealiability in a trained model. Sensie was written with scientific applications in mind, but can be used on any trained model.
 
-Sensie can operate on models trained for discrete (classifier) or ~~continuous (regression) outputs~~ (coming soon).
+Sensie can operate on models trained for discrete classes (classifier); similar tools for regression will be added in the next release.
 
 Sensie can be adapted to works on any predictive model.
 
@@ -110,7 +110,7 @@ If you use Sensie and run into any problems, please open an issue here.
 
 Any questions, comments and suggestions can be sent via GitHub or to colin(@)coljac.net.
 
-Contributions are welcome. Fork this repository to your own machine, make some changes, and push your work back up to the fork and open a [Pull Request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests) so that I can review the changes.
+Contributions are welcome. Fork this repository to your own machine, make some changes, and push your work back up to the fork and open a [pull request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests) so that I can review the changes.
 
 ### References
 
