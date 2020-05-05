@@ -350,7 +350,7 @@ class Probe(object):
                 # results.tests[label].set_credible_interval(means_only=False)
             # else:
             results.tests[propname].get_gradient()
-            self._plot_property(results.tests[propname], label=label)
+            self.plot_property(results.tests[propname], label=label)
 
         return results
 
@@ -504,7 +504,7 @@ class Probe(object):
                 results.tests[label].set_credible_interval(means_only=False)
             else:
                 results.tests[label].get_gradient()
-            self._plot_property(results.tests[label], label=label)
+            self.plot_property(results.tests[label], label=label)
 
         return results
 
@@ -528,7 +528,7 @@ class Probe(object):
         labels = [str(x) for x in range(len(np.unique(y_test)))]
         labels = results.tests['class'].sort_and_reorder(labels)
         if plot:
-            self._plot_property(results.tests['class'], label="class", ticklabels=labels)
+            self.plot_property(results.tests['class'], label="class", ticklabels=labels)
         return results
 
 
@@ -548,8 +548,33 @@ class Probe(object):
             # plt.title(f"{label} significance: {summary.significance}");
 
 
-    def _plot_property(self, test, label="property", show_fit=False, fit="line", annotate=False, save_to=None, ticklabels=None, errorbars=True, fitorder=2):
-        """Generates a plot from a SingleTest result."""
+    def plot_property(self, test, label="property", show_fit=False, fit="line", save_to=None, ticklabels=None, errorbars=True, fitorder=2):
+        """Generates a plot from a SingleTest result.
+
+        test: SingleTest
+            The test to visualize.
+
+        label: str
+            Readable description for the property tested.
+
+        show_fit: bool
+            If True, a fit to the data will be plotted.
+
+        fit: str
+            "line" or "polynomial" - the fit to be shown.
+
+        fitorder:
+            For a polynomial, the order of the fit.
+
+        save_to: str
+            Filename to save the figure to.
+
+        ticklabels: list
+            Labels for the x axis. Useful (for instance) when plotting class names.
+
+        errorbars: bool
+            Plot error bars - one standard deviation from the mean score in the correct class.
+        """
 
         if errorbars:
             plt.errorbar(test.p_vals, test.means, yerr=test.stds, marker="o", fmt='-o')
