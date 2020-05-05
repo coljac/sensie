@@ -23,6 +23,8 @@ Deep neural networks (DNNs) are finding increasing application across a wide var
 
 However, simply inspecting the most salient regions of an input image (or other input) may not always be sufficiently interpretable. Here we present ``Sensie``, a python package to quickly inspect and quantify the sensitivity of a trained model to user-specified properties of the input domain, or under the arbitrary transformation of a test set.
 
+Several quality software packages exist to probe ANN internals, such as ``Innvestigate``[^innvestigate] ``tf-explain``[^tfe], and ``keras-vis``[^kvis]. These packages are geared towards traditional image-based applications, and cannot explore relationships between the neural network performance and arbitrary properties of the examples presented to the network. ``Sensie`` is designed to fill that gap.
+
 # Method
 
 ``Sensie`` helps the user explore the sensitivity of a machine learning model to properties of data (using a test set with known, correct outputs). ``Sensie`` wraps a pre-trained model, and assists in quantifying and visualising changes in the performance of the model as a function of either a specified property of the data (one that is explicitly passed to the model at test time, or other metadata); or a perturbation of the data, parameterised by a value *p*. In addition, ``Sensie`` offers a convenience method to display the sensitivity of a classification model to the class itself, though this should be used with caution.
@@ -60,3 +62,7 @@ In the first case, A), ``Sensie`` can optionally forego binning by P, and treat 
 # References
 
 [^bayesian]: See https://docs.pymc.io/notebooks/GLM-linear.html for an example using the PyMC3 probabilistic programming framework.
+[^innvestigate]: https://github.com/albermax/innvestigate
+[^tfe]: https://github.com/sicara/tf-explain
+[^kvis]: https://github.com/raghakot/keras-vis
+
