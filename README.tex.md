@@ -1,4 +1,4 @@
-# Sensie version 0.0.1
+# Sensie version 0.1
 
 Sensie is toolset for probing the sensitivity of a deep neural 
 network model to various properties of the data. 

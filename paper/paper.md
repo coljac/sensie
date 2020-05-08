@@ -23,7 +23,7 @@ Deep neural networks (DNNs) are finding increasing application across a wide var
 
 However, simply inspecting the most salient regions of an input image (or other input) may not always be sufficiently interpretable. Here we present ``Sensie``, a python package to quickly inspect and quantify the sensitivity of a trained model to user-specified properties of the input domain, or under the arbitrary transformation of a test set.
 
-Several quality software packages exist to probe ANN internals, such as ``Innvestigate``[^innvestigate] ``tf-explain``[^tfe], and ``keras-vis``[^kvis]. These packages are geared towards traditional image-based applications, and cannot explore relationships between the neural network performance and arbitrary properties of the examples presented to the network. ``Sensie`` is designed to fill that gap.
+Several quality software packages exist to probe ANN internals, such as ``Innvestigate``[^innvestigate], ``tf-explain``[^tfe], and ``keras-vis``[^kvis]. These packages are geared towards traditional image-based applications, and cannot explore relationships between the neural network performance and arbitrary properties of the examples presented to the network. ``Sensie`` is designed to fill that gap.
 
 # Method
 
@@ -51,7 +51,7 @@ Several quality software packages exist to probe ANN internals, such as ``Innves
 In the first case, A), ``Sensie`` can optionally forego binning by P, and treat every element as a data point in determining the trend.
 
 
-![Left: Output from ``Sensie`` for a model trained to recognise handwritten digits, testing model sensitivity to rotation. Error bars show the standard deviation for the mean ground-truth-class score. Right: Sensitivity of a model to ann applied blir of the input image data, showing a linear fit to a significant region.](sensie_examples.png)
+![Left: Output from ``Sensie`` for a model trained to recognise handwritten digits, testing model sensitivity to rotation. Error bars show the standard deviation for the mean ground-truth-class score. Right: Sensitivity of a model to an applied blur of the input image data, showing a linear fit to a significant region.](sensie_examples.png)
 
 # Discussion and conclusion
 
