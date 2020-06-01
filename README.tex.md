@@ -1,4 +1,4 @@
-# Sensie version 0.1
+# Sensie v. 0.1
 
 Sensie is toolset for probing the sensitivity of a deep neural 
 network model to various properties of the data. 
@@ -22,6 +22,8 @@ Sensie can be adapted to works on any predictive model.
 
 Sensie assumes a model object with a ``predict`` method (as per Keras), but with a user supplied predictor function any framework should be usable. Python prequisites are listed in `requirements.txt`. The [pymc3](https://github.com/pymc-devs/pymc3) probabilistic programming framework is required for the (optional) determination of credible intervals for feature sensitivities. This can be used to assess the significance of a sensitivity analysis.
 
+Sensie requires python 3.6 or above.
+
 ## Installation
 
 After cloning the repository, I recommend creating a [virtual environment](https://docs.python.org/3/library/venv.html) for Sensie (currently, Sensie requires PyMC3 3.7). Clone the repository and install with:
@@ -30,7 +32,7 @@ After cloning the repository, I recommend creating a [virtual environment](https
 pip install -e .
 ```
 
-Which will isntall Sensie and the required python libraries. Optionally, install `pytest` with `pip install pytest`, then run the tests with `pytest test` from the repository root.
+Which will install Sensie and the required python libraries. Optionally, install `pytest` with `pip install pytest`, then run the tests with `pytest test` from the repository root.
 
 ## Outline of usage
 
@@ -55,7 +57,7 @@ Sensie assumes that `model.predict` returns a tensor `t` with categorical scores
 
 Detailed documentation can be accessed at [readthedocs.org](https://sensie.readthedocs.io/en/latest/).
 
-## Calculation of the signficance of the effect
+## Calculation of the significance of the effect
 
 When Sensie reports the significance of the effect, it is reporting whether there is a detectable
 linear relationship between the property measured and model's score for the correct class for

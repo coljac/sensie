@@ -1,5 +1,5 @@
-Sensie: Simple neural network sensitivity
-=========================================
+Sensie: Probing the sensitivity of neural networks
+==================================================
 
 Introduction
 ^^^^^^^^^^^^
@@ -19,7 +19,9 @@ Check out the repository and install with::
 
 (or add the sensie directory to your PYTHONPATH.)
 
-Dependencies are listed in ``requirements.txt`` included in the repository.
+Dependencies are listed in ``requirements.txt`` included in the repository. Sensie requires python 3.6 or above.
+
+Optionally, install pytest with ``pip install pytest``, then run the tests with ``pytest test`` from the repository root.
 
 
 .. toctree::
