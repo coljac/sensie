@@ -59,6 +59,10 @@ In the first case, A), ``Sensie`` can optionally forego binning by P, and treat 
 
 ``Sensie`` has been successfully applied to a model trained for astronomical classification [@jacobsExtendedCatalogGalaxy2019] to indicate the model's sensitivity to the scale of features present in the input; the signal-to-noise ratio of the input data; the colours of the input; and astrophysical properties of the objects present in an input image.
 
+# Acknowledgements
+
+The author acknowledges support from Karl Glazebrook’s Australian Research Council Laureate Fellowship FL180100060.
+
 # References
 
 [^bayesian]: See https://docs.pymc.io/notebooks/GLM-linear.html for an example using the PyMC3 probabilistic programming framework.
