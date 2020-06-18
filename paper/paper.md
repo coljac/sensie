@@ -10,7 +10,7 @@ authors:
     orcid: 0000-0003-4239-4055
     affiliation: "1" 
 affiliations:
- - name: Swinburne University of Technology
+ - name: Center for Astrophysics and Supercomputing, Swinburne University of Technology
    index: 1
 date: 20 March 2020
 bibliography: paper.bib
@@ -23,7 +23,7 @@ Deep neural networks (DNNs) are finding increasing application across a wide var
 
 However, simply inspecting the most salient regions of an input image (or other input) may not always be sufficiently interpretable. Here we present ``Sensie``, a python package to quickly inspect and quantify the sensitivity of a trained model to user-specified properties of the input domain, or under the arbitrary transformation of a test set.
 
-Several quality software packages exist to probe artificial neural network internals, such as ``Innvestigate`` [@alberINNvestigateNeuralNetworks2018], ``tf-explain``[^tfe], and ``keras-vis``[@raghakotkerasvis]. These packages are geared towards traditional image-based applications, and cannot explore relationships between the neural network performance and arbitrary properties of the examples presented to the network. ``Sensie`` is designed to fill that gap.
+Several quality software packages exist to probe artificial neural network internals, such as ``Innvestigate`` [@alberINNvestigateNeuralNetworks2018], ``tf-explain``[^tfe], and ``keras-vis`` [@raghakotkerasvis]. These packages are geared towards traditional image-based applications, and cannot explore relationships between the neural network performance and arbitrary properties of the examples presented to the network. ``Sensie`` is designed to fill that gap.
 
 # Method
 
